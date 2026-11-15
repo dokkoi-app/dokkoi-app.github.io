@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Voice Memo for Work</title>
+<meta property="og:title" content="Voice Memo for Work">
+<meta property="og:description" content="Folder invitation">
+<meta property="og:image" content="https://dokkoi-app.github.io/join/og.png">
+<meta name="apple-itunes-app" content="app-id=6762629584">
+<link rel="apple-touch-icon" href="icon.png">
+<style>
+  :root { color-scheme: light dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Segoe UI", Roboto, "Noto Sans", sans-serif;
+    background: #fff; color: #111; -webkit-font-smoothing: antialiased;
+  }
+  main { width: 100%; max-width: 380px; padding: 48px 28px; text-align: center; }
+  img { width: 88px; height: 88px; border-radius: 20px; border: 1px solid rgba(0,0,0,.08); }
+  .app { margin: 14px 0 28px; font-size: 13px; color: #8e8e93; }
+  h1 { margin: 0 0 28px; font-size: 22px; font-weight: 600; line-height: 1.4; }
+  a.btn {
+    display: block; padding: 15px; border-radius: 14px; font-size: 16px; font-weight: 600;
+    text-decoration: none; margin-bottom: 12px;
+  }
+  .primary { background: #111; color: #fff; }
+  .secondary { background: #f2f2f7; color: #111; }
+  p { margin: 16px 0 0; font-size: 13px; line-height: 1.6; color: #6e6e73; }
+  [hidden] { display: none !important; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #000; color: #f5f5f7; }
+    img { border-color: rgba(255,255,255,.12); }
+    .primary { background: #f5f5f7; color: #000; }
+    .secondary { background: #1c1c1e; color: #f5f5f7; }
+    p { color: #98989d; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <img src="icon.png" alt="">
+  <div class="app">Voice Memo for Work</div>
+  <h1 id="title"></h1>
+  <div id="ios" hidden>
+    <a class="btn primary" id="open" href="#"></a>
+    <a class="btn secondary" id="store" href="https://apps.apple.com/app/id6762629584"></a>
+    <p id="note"></p>
+  </div>
+  <div id="other" hidden>
+    <p id="otherText"></p>
+    <p><a id="store2" href="https://apps.apple.com/app/id6762629584"></a></p>
+  </div>
+</main>
+<script>
+// 招待のページ。iCloud の招待リンクとフォルダ名は「#」より後ろにあり、サーバーには送られない。
+// 開いた端末に合わせて、アプリで開くボタン（iPhone・iPad）か、iPhone で開くよう案内（ほかの端末）を出す。
+(function () {
+  var T = {
+    ja: { title: "「%@」フォルダへの招待", titleAny: "フォルダへの招待", open: "アプリで開く", store: "App Store で入手",
+          note: "アプリを入れたあと、もう一度「アプリで開く」を押してください。",
+          other: "この招待は、iPhone・iPad の Voice Memo for Work で開けます。iPhone でこのリンクを開いてください。" },
+    en: { title: "Invitation to the “%@” folder", titleAny: "Folder invitation", open: "Open in the App", store: "Get it on the App Store",
+          note: "After installing the app, tap “Open in the App” again.",
+          other: "This invitation opens in Voice Memo for Work on iPhone or iPad. Open this link on your iPhone." },
+    de: { title: "Einladung zum Ordner „%@“", titleAny: "Einladung zu einem Ordner", open: "In der App öffnen", store: "Im App Store laden",
+          note: "Tippe nach der Installation erneut auf „In der App öffnen“.",
+          other: "Diese Einladung lässt sich in Voice Memo for Work auf dem iPhone oder iPad öffnen. Öffne diesen Link auf deinem iPhone." },
+    es: { title: "Invitación a la carpeta «%@»", titleAny: "Invitación a una carpeta", open: "Abrir en la app", store: "Descargar en el App Store",
+          note: "Después de instalar la app, toca de nuevo «Abrir en la app».",
+          other: "Esta invitación se abre en Voice Memo for Work en iPhone o iPad. Abre este enlace en tu iPhone." },
+    fr: { title: "Invitation au dossier « %@ »", titleAny: "Invitation à un dossier", open: "Ouvrir dans l’app", store: "Télécharger dans l’App Store",
+          note: "Après avoir installé l’app, touchez de nouveau « Ouvrir dans l’app ».",
+          other: "Cette invitation s’ouvre dans Voice Memo for Work sur iPhone ou iPad. Ouvrez ce lien sur votre iPhone." },
+    pt: { title: "Convite para a pasta “%@”", titleAny: "Convite para uma pasta", open: "Abrir no app", store: "Baixar na App Store",
+          note: "Depois de instalar o app, toque de novo em “Abrir no app”.",
+          other: "Este convite abre no Voice Memo for Work no iPhone ou iPad. Abra este link no seu iPhone." },
+    ko: { title: "‘%@’ 폴더 초대", titleAny: "폴더 초대", open: "앱에서 열기", store: "App Store에서 받기",
+          note: "앱을 설치한 후 ‘앱에서 열기’를 다시 누르세요.",
+          other: "이 초대는 iPhone·iPad의 Voice Memo for Work에서 열 수 있습니다. iPhone에서 이 링크를 여세요." },
+    ru: { title: "Приглашение в папку «%@»", titleAny: "Приглашение в папку", open: "Открыть в приложении", store: "Загрузить в App Store",
+          note: "После установки приложения снова нажмите «Открыть в приложении».",
+          other: "Это приглашение открывается в Voice Memo for Work на iPhone или iPad. Откройте эту ссылку на iPhone." },
+    tr: { title: "“%@” klasörüne davet", titleAny: "Klasör daveti", open: "Uygulamada aç", store: "App Store’dan indir",
+          note: "Uygulamayı yükledikten sonra “Uygulamada aç”a yeniden dokunun.",
+          other: "Bu davet iPhone veya iPad’deki Voice Memo for Work’te açılır. Bu bağlantıyı iPhone’unuzda açın." },
+    ar: { title: "دعوة إلى مجلد «%@»", titleAny: "دعوة إلى مجلد", open: "الفتح في التطبيق", store: "التنزيل من App Store",
+          note: "بعد تثبيت التطبيق، اضغط على «الفتح في التطبيق» مرة أخرى.",
+          other: "تُفتح هذه الدعوة في Voice Memo for Work على iPhone أو iPad. افتح هذا الرابط على iPhone." },
+    "zh-Hans": { title: "“%@”文件夹的邀请", titleAny: "文件夹邀请", open: "在 App 中打开", store: "在 App Store 获取",
+          note: "安装 App 后，请再次轻点“在 App 中打开”。",
+          other: "此邀请可在 iPhone、iPad 上的 Voice Memo for Work 中打开。请在 iPhone 上打开此链接。" },
+    "zh-Hant": { title: "「%@」資料夾的邀請", titleAny: "資料夾邀請", open: "在 App 中開啟", store: "在 App Store 取得",
+          note: "安裝 App 後，請再次點一下「在 App 中開啟」。",
+          other: "此邀請可在 iPhone、iPad 上的 Voice Memo for Work 中開啟。請在 iPhone 上開啟此連結。" }
+  };
+
+  function pickLang() {
+    var langs = navigator.languages || [navigator.language || "en"];
+    for (var i = 0; i < langs.length; i++) {
+      var l = (langs[i] || "").toLowerCase();
+      if (l.indexOf("zh") === 0) return (l.indexOf("hant") >= 0 || /-(tw|hk|mo)/.test(l)) ? "zh-Hant" : "zh-Hans";
+      var base = l.split("-")[0];
+      if (T[base]) return base;
+    }
+    return "en";
+  }
+
+  var lang = pickLang(), t = T[lang];
+  document.documentElement.lang = lang;
+  if (lang === "ar") document.documentElement.dir = "rtl";
+
+  // #n=<フォルダ名>&u=<iCloud の招待リンク>
+  var params = {};
+  location.hash.replace(/^#/, "").split("&").forEach(function (kv) {
+    var i = kv.indexOf("=");
+    if (i > 0) { try { params[kv.slice(0, i)] = decodeURIComponent(kv.slice(i + 1)); } catch (e) {} }
+  });
+  var name = (params.n || "").slice(0, 80);
+  // iCloud の招待リンクだけを通す（ほかのサイトへ飛ばす踏み台にさせない）
+  var share = /^https:\/\/www\.icloud\.com\/share\/[A-Za-z0-9_\-]+(#.*)?$/.test(params.u || "") ? params.u : "";
+
+  var title = name ? t.title.replace("%@", name) : t.titleAny;
+  document.getElementById("title").textContent = title;
+  document.title = title + " — Voice Memo for Work";
+
+  var isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) ||
+              (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);   // iPad（デスクトップ表示）
+  document.getElementById("store").textContent = t.store;
+  document.getElementById("store2").textContent = t.store;
+  if (isIOS) {
+    document.getElementById("ios").hidden = false;
+    var open = document.getElementById("open");
+    if (share) { open.textContent = t.open; open.href = share; } else { open.hidden = true; }
+    document.getElementById("note").textContent = share ? t.note : "";
+  } else {
+    document.getElementById("other").hidden = false;
+    document.getElementById("otherText").textContent = t.other;
+  }
+})();
+</script>
+</body>
+</html>
